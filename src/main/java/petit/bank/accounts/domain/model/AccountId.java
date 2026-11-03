@@ -19,7 +19,7 @@ public record AccountId(UUID value) {
         return new AccountId(UUID.randomUUID());
     }
 
-    public static AccountId of (UUID value) {
+    public static AccountId of(UUID value) {
         return new AccountId(value);
     }
 

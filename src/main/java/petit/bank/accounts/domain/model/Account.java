@@ -15,22 +15,22 @@ public final class Account {
     private Money balance;
 
 
-    private Account (AccountId id, Money balance) {
+    private Account(AccountId id, Money balance) {
         this.id = Objects.requireNonNull(id, "id não pode ser nulo");
         this.balance = Objects.requireNonNull(balance, "balance não pode ser nulo");
     }
 
-    public static Account open (AccountId id, Currency currency) {
+    public static Account open(AccountId id, Currency currency) {
         Objects.requireNonNull(currency, "currency não pode ser nula");
         return new Account(id, Money.zero(currency));
     }
 
-    public void credit (Money amount) {
+    public void credit(Money amount) {
         requirePositive(amount);
         this.balance = this.balance.add(amount);
     }
 
-    public void debit (Money amount) {
+    public void debit(Money amount) {
         requirePositive(amount);
         if (amount.isGreaterThan(balance)) {
             throw new InsufficientFundsException();
