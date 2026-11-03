@@ -22,11 +22,11 @@ public record LedgerEntry(AccountId account, EntryDirection direction, Money amo
         }
     }
 
-    public static LedgerEntry debit (AccountId account, Money amount) {
+    public static LedgerEntry debit(AccountId account, Money amount) {
         return new LedgerEntry(account, EntryDirection.DEBIT, amount);
     }
 
-    public static LedgerEntry credit (AccountId account, Money amount) {
+    public static LedgerEntry credit(AccountId account, Money amount) {
         return new LedgerEntry(account, EntryDirection.CREDIT, amount);
     }
 }

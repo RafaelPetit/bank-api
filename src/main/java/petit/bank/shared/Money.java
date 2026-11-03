@@ -17,7 +17,7 @@ import java.util.Objects;
  */
 public record Money(BigDecimal amount, Currency currency) {
 
-    public Money{
+    public Money {
         Objects.requireNonNull(amount, "amount não pode ser nulo");
         Objects.requireNonNull(amount, "currency não pode ser nula");
         int fractionDigits = Math.max(currency.getDefaultFractionDigits(), 0);

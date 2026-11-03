@@ -53,7 +53,7 @@ public class TransactionTest {
     void entriesSaoImutaveis() {
 
         Transaction tx = Transaction.transfer(origem, destino, Money.of("10.00", BRL));
-        LedgerEntry novo = LedgerEntry.debit(origem,  Money.of("10.00", BRL));
+        LedgerEntry novo = LedgerEntry.debit(origem, Money.of("10.00", BRL));
 
         assertThrows(UnsupportedOperationException.class, () -> tx.entries().add(novo));
     }
