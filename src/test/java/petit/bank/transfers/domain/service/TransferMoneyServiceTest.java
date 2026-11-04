@@ -6,7 +6,7 @@ import petit.bank.accounts.domain.model.Account;
 import petit.bank.accounts.domain.model.AccountId;
 import petit.bank.accounts.domain.model.AccountNotFoundException;
 import petit.bank.accounts.domain.model.InsufficientFundsException;
-import petit.bank.accounts.infrastructure.adapter.out.presistence.InMemoryAccountRepository;
+import petit.bank.accounts.infrastructure.adapter.out.persistence.InMemoryAccountRepository;
 import petit.bank.ledger.domain.model.TransactionId;
 import petit.bank.ledger.infrastructure.adapter.out.persistence.InMemoryLedgerRepository;
 import petit.bank.shared.CurrencyMismatchException;

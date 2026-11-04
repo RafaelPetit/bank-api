@@ -1,4 +1,4 @@
-package petit.bank.accounts.infrastructure.adapter.out.presistence;
+package petit.bank.accounts.infrastructure.adapter.out.persistence;
 
 import petit.bank.accounts.domain.model.Account;
 import petit.bank.accounts.domain.model.AccountId;
