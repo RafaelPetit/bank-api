@@ -14,15 +14,22 @@ public final class Account {
     private final AccountId id;
     private Money balance;
 
-
     private Account(AccountId id, Money balance) {
         this.id = Objects.requireNonNull(id, "id não pode ser nulo");
         this.balance = Objects.requireNonNull(balance, "balance não pode ser nulo");
+
+        if (balance.isNegative()) {
+            throw new IllegalArgumentException("Saldo de uma conta não pode ser negativo");
+        }
     }
 
     public static Account open(AccountId id, Currency currency) {
         Objects.requireNonNull(currency, "currency não pode ser nula");
         return new Account(id, Money.zero(currency));
+    }
+
+    public static Account restore(AccountId id, Money balance) {
+        return new Account(id, balance);
     }
 
     public void credit(Money amount) {

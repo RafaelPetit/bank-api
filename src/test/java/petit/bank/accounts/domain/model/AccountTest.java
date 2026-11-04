@@ -36,7 +36,7 @@ public class AccountTest {
     }
 
     @Test
-    @DisplayName("devita reduz o saldo")
+    @DisplayName("debita reduz o saldo")
     void debita() {
         Account conta = Account.open(AccountId.generate(), BRL);
         conta.credit(Money.of("100.00", BRL));
@@ -77,7 +77,7 @@ public class AccountTest {
     }
 
     @Test
-    @DisplayName("valor não possitivo é rejeitado")
+    @DisplayName("valor não positivo é rejeitado")
     void valorNaoPositivo() {
         Account conta = Account.open(AccountId.generate(), BRL);
 
@@ -95,5 +95,22 @@ public class AccountTest {
 
         assertEquals(a, b);
         assertNotEquals(a, outra);
+    }
+
+    @Test
+    @DisplayName("restore reconstrói a conta com o saldo informado")
+    void restoreReconstroiComSaldo() {
+        AccountId id = AccountId.generate();
+        Account conta = Account.restore(id, Money.of("150.00", BRL));
+
+        assertEquals(id, conta.id());
+        assertEquals(Money.of("150.00", BRL), conta.balance());
+    }
+
+    @Test
+    @DisplayName("restore rejeita saldo negativo")
+    void restoreRejeitaSaldoNegativo() {
+        assertThrows(IllegalArgumentException.class,
+                () -> Account.restore(AccountId.generate(), Money.of("-0.01", BRL)));
     }
 }
