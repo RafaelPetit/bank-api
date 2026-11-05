@@ -19,7 +19,8 @@ public record Money(BigDecimal amount, Currency currency) {
 
     public Money {
         Objects.requireNonNull(amount, "amount não pode ser nulo");
-        Objects.requireNonNull(amount, "currency não pode ser nula");
+        Objects.requireNonNull(currency, "currency não pode ser nula");
+
         int fractionDigits = Math.max(currency.getDefaultFractionDigits(), 0);
         amount = amount.setScale(fractionDigits, RoundingMode.HALF_EVEN);
     }
@@ -30,6 +31,19 @@ public record Money(BigDecimal amount, Currency currency) {
 
     public static Money of(String amount, Currency currency) {
         return new Money(new BigDecimal(amount), currency);
+    }
+
+    public static Money ofExact(String amount, Currency currency) {
+        Objects.requireNonNull(currency, "currency não pode ser nula");
+
+        int fractionDigits = Math.max(currency.getDefaultFractionDigits(), 0);
+
+        try {
+            return new Money(new BigDecimal(amount).setScale(fractionDigits, RoundingMode.UNNECESSARY), currency);
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("Valor com mais casas decimais do que a moeda permite", e);
+        }
+
     }
 
     public static Money zero(Currency currency) {
@@ -60,11 +74,13 @@ public record Money(BigDecimal amount, Currency currency) {
 
     public boolean isGreaterThan(Money other) {
         requireSameCurrency(other);
+
         return amount.compareTo(other.amount) > 0;
     }
 
     private void requireSameCurrency(Money other) {
         Objects.requireNonNull(other, "other não pode ser nulo");
+
         if (!currency.equals(other.currency)) {
             throw new CurrencyMismatchException(currency, other.currency);
         }

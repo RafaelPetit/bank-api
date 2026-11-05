@@ -90,4 +90,23 @@ class MoneyTest {
         assertTrue(Money.of("10.00", BRL).isGreaterThan(Money.of("9.99", BRL)));
         assertFalse(Money.of("9.99", BRL).isGreaterThan(Money.of("10.00", BRL)));
     }
+
+    @Test
+    @DisplayName("currency nula não cria Money")
+    void currencyNulaFalha() {
+        assertThrows(NullPointerException.class, () -> Money.of(BigDecimal.TEN, null));
+    }
+
+    @Test
+    @DisplayName("ofExact aceita valor dentro das casas da moeda")
+    void ofExactAceitaValorValido() {
+        assertEquals(Money.of("10.50", BRL), Money.ofExact("10.5", BRL));
+        assertEquals(Money.of("10.50", BRL), Money.ofExact("10.500", BRL));
+    }
+
+    @Test
+    @DisplayName("ofExact rejeita valor que precisaria de arredondamento")
+    void ofExactRejeitaArredondamento() {
+        assertThrows(IllegalArgumentException.class, () -> Money.ofExact("10.555", BRL));
+    }
 }
