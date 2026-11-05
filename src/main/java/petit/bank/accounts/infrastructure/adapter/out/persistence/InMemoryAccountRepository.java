@@ -1,5 +1,6 @@
 package petit.bank.accounts.infrastructure.adapter.out.persistence;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import petit.bank.accounts.domain.model.Account;
 import petit.bank.accounts.domain.model.AccountId;
 import petit.bank.accounts.domain.port.out.AccountRepository;
@@ -15,10 +16,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * estado (o saldo) e reconstrói uma conta nova a cada leitura, de modo que alterar uma conta
  * lida não afeta o que está guardado até que ela seja salva.
  */
+@ApplicationScoped
 public class InMemoryAccountRepository implements AccountRepository {
 
     private final Map<AccountId, Money> balances = new ConcurrentHashMap<>();
-
 
     @Override
     public Optional<Account> findById(AccountId id) {

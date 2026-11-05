@@ -1,5 +1,6 @@
 package petit.bank.ledger.infrastructure.adapter.out.persistence;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import petit.bank.ledger.domain.model.Transaction;
 import petit.bank.ledger.domain.port.out.LedgerRepository;
 
@@ -12,6 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * desenvolvimento. Guarda as transações numa lista apenas acrescentada (append-only).
  * {@code transactions()} existe só para inspeção em testes e não faz parte da porta.
  */
+@ApplicationScoped
 public class InMemoryLedgerRepository implements LedgerRepository {
 
     private final List<Transaction> transactions = new CopyOnWriteArrayList<>();
