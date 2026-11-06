@@ -118,7 +118,7 @@ forma deliberada — saber _quando não distribuir_ faz parte da proposta.
 
 | Fase | Foco                                                      | Status |
 |:----:|-----------------------------------------------------------|:------:|
-| 0    | Domínio puro + Hexagonal (monólito modular)               | 🔨 Em andamento |
+| 0    | Domínio puro + Hexagonal (monólito modular)               | ✅  Concluída |
 | 1    | Concorrência + consistência (locking, idempotência)       | ⏳ |
 | 2    | Persistência + Outbox + testes de integração              | ⏳ |
 | 3    | Kafka + eventos + Saga                                    | ⏳ |
@@ -148,16 +148,16 @@ java -jar target/quarkus-app/quarkus-run.jar
 
 # Imagem nativa (requer GraalVM; ou use -Dquarkus.native.container-build=true)
 ./mvnw package -Dnative
-./target/bank-api-1.0.0-runner
+./target/bank-api-0.1.0-runner
 ```
 
 ---
 
 ## 📌 Status atual
 
-Projeto em **Fase 0**: modelagem do domínio puro da transferência de dinheiro
-(`Money`, `Account`, `Transaction`/`LedgerEntry` e as portas). O _scaffold_ inicial do Quarkus
-está sendo substituído pelo primeiro _bounded context_.
+Fase 0 concluída (`v0.1.0`): domínio puro, portas e adapters em memória, com a transferência
+exposta em `POST /transfers`. Os dados ficam em memória e a API ainda não tem autenticação,
+então o uso é apenas local. A próxima é a Fase 1: concorrência e idempotência.
 
 ---
 
