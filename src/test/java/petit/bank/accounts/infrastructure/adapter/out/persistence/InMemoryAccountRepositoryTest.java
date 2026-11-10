@@ -8,13 +8,14 @@ import petit.bank.accounts.domain.model.ConcurrentAccountUpdateException;
 import petit.bank.shared.Money;
 
 import java.util.Currency;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Testes do lock otimista no repositório em memória: cada gravação avança a versão, e gravar
- * a partir de uma leitura desatualizada é recusado sem alterar o que está guardado.
+ * Testes do lock otimista no repositório em memória: cada gravação avança a versão,
+ * gravar a partir de uma leitura desatualizada é recusado, e uma gravação em grupo é tudo ou nada.
  */
 public class InMemoryAccountRepositoryTest {
 
@@ -51,7 +52,33 @@ public class InMemoryAccountRepositoryTest {
         segunda.credit(Money.of("99.00", BRL));
         assertThrows(ConcurrentAccountUpdateException.class, () -> accounts.save(segunda));
 
-        assertEquals(Money.of("10.00", BRL), accounts.findById(conta.id()).orElseThrow().balance());
+        assertEquals(Money.of("10.00", BRL),
+                accounts.findById(conta.id()).orElseThrow().balance());
+    }
+
+    @Test
+    @DisplayName("gravação em grupo com uma conta desatualizada não grava nenhuma")
+    void gravacaoEmGrupoTudoOuNada() {
+        Account a = Account.open(AccountId.generate(), BRL);
+        Account b = Account.open(AccountId.generate(), BRL);
+        accounts.saveAll(List.of(a, b));
+
+        Account aLida = accounts.findById(a.id()).orElseThrow();
+        Account bLida = accounts.findById(b.id()).orElseThrow();
+
+        Account bPorOutraOperacao = accounts.findById(b.id()).orElseThrow();
+        bPorOutraOperacao.credit(Money.of("5.00", BRL));
+        accounts.save(bPorOutraOperacao);
+
+        aLida.credit(Money.of("10.00", BRL));
+        bLida.credit(Money.of("10.00", BRL));
+        assertThrows(ConcurrentAccountUpdateException.class,
+                () -> accounts.saveAll(List.of(aLida, bLida)));
+
+        assertEquals(Money.of("0.00", BRL),
+                accounts.findById(aLida.id()).orElseThrow().balance());
+        assertEquals(Money.of("5.00", BRL),
+                accounts.findById(bLida.id()).orElseThrow().balance());
     }
 
 }
