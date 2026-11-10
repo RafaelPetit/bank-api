@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.Response;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 import petit.bank.accounts.domain.model.AccountNotFoundException;
+import petit.bank.accounts.domain.model.ConcurrentAccountUpdateException;
 import petit.bank.accounts.domain.model.InsufficientFundsException;
 import petit.bank.ledger.domain.model.TransactionId;
 import petit.bank.shared.CurrencyMismatchException;
@@ -47,6 +48,12 @@ public class TransferResource {
     @ServerExceptionMapper
     RestResponse<ErrorResponse> map(CurrencyMismatchException e) {
         return unprocessable("CURRENCY_MISMATCH", "Moeda diferente da moeda da conta");
+    }
+
+    @ServerExceptionMapper
+    RestResponse<ErrorResponse> map(ConcurrentAccountUpdateException e) {
+        return RestResponse.status(Response.Status.CONFLICT,
+                new ErrorResponse("CONCURRENT_UPDATE", "A conta foi alterada por outra operação; tente novamente"));
     }
 
     @ServerExceptionMapper
