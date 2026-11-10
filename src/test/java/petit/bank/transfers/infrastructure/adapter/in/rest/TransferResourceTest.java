@@ -136,7 +136,11 @@ public class TransferResourceTest {
     }
 
     private AccountId contaComSaldo(String valor, Currency moeda) {
-        Account conta = Account.restore(AccountId.generate(), Money.of(valor, moeda));
+        Account conta = Account.open(AccountId.generate(), moeda);
+        Money saldo = Money.of(valor, moeda);
+        if (saldo.isPositive()) {
+            conta.credit(saldo);
+        }
 
         accounts.save(conta);
 
