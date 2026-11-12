@@ -9,6 +9,7 @@ import petit.bank.accounts.domain.port.out.AccountRepository;
 import petit.bank.accounts.infrastructure.adapter.out.persistence.InMemoryAccountRepository;
 import petit.bank.ledger.infrastructure.adapter.out.persistence.InMemoryLedgerRepository;
 import petit.bank.shared.Money;
+import petit.bank.transfers.domain.model.IdempotencyKey;
 import petit.bank.transfers.domain.port.in.TransferMoneyCommand;
 
 import java.util.Currency;
@@ -60,7 +61,7 @@ public class TransferMoneyConcurrencyTest {
 
         assertThrows(ConcurrentAccountUpdateException.class,
                 () -> service.transfer(new TransferMoneyCommand(origem, destino,
-                        Money.of("60.00", BRL))));
+                        Money.of("60.00", BRL), IdempotencyKey.generate())));
 
         assertEquals(Money.of("100.00", BRL), saldoDe(origem));
         assertEquals(Money.of("10.00", BRL), saldoDe(destino));
@@ -70,7 +71,7 @@ public class TransferMoneyConcurrencyTest {
     private void tentarTransferir(TransferMoneyService service, AccountId origem, AccountId destino) {
         try {
             service.transfer(new TransferMoneyCommand(origem, destino,
-                    Money.of("60.00", BRL)));
+                    Money.of("60.00", BRL), IdempotencyKey.generate()));
         } catch (RuntimeException e) {
             // A transferência perdedora falha; quem confere o resultado são as asserções.
         }

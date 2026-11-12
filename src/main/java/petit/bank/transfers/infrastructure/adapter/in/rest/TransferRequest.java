@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import petit.bank.accounts.domain.model.AccountId;
 import petit.bank.shared.Money;
+import petit.bank.transfers.domain.model.IdempotencyKey;
 import petit.bank.transfers.domain.port.in.TransferMoneyCommand;
 
 import java.util.Currency;
@@ -22,7 +23,9 @@ public record TransferRequest(
         return new TransferMoneyCommand(
                 AccountId.of(from),
                 AccountId.of(to),
-                Money.ofExact(amount, Currency.getInstance(currency))
+                Money.ofExact(amount, Currency.getInstance(currency)),
+                // Provisório: na próxima etapa a chave vem do cabeçalho Idempotency-Key.
+                IdempotencyKey.generate()
         );
     }
 }
