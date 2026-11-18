@@ -5,6 +5,9 @@ import jakarta.enterprise.inject.Produces;
 import petit.bank.accounts.domain.port.out.AccountRepository;
 import petit.bank.ledger.domain.port.out.LedgerRepository;
 import petit.bank.transfers.domain.port.in.TransferMoneyUseCase;
+import petit.bank.transfers.domain.port.out.IdempotencyStore;
+import petit.bank.transfers.domain.service.IdempotentTransferMoneyUseCase;
+import petit.bank.transfers.domain.service.RetryingTransferMoneyUseCase;
 import petit.bank.transfers.domain.service.TransferMoneyService;
 
 /**
@@ -16,7 +19,10 @@ public class TransferBeans {
 
     @Produces
     @ApplicationScoped
-    TransferMoneyUseCase transferMoneyUseCase(AccountRepository accounts, LedgerRepository ledger) {
-        return new TransferMoneyService(accounts, ledger);
+    TransferMoneyUseCase transferMoneyUseCase(AccountRepository accounts, LedgerRepository ledger, IdempotencyStore idempotency) {
+        TransferMoneyUseCase transfer = new TransferMoneyService(accounts, ledger);
+        TransferMoneyUseCase withRetry = new RetryingTransferMoneyUseCase(transfer, 3);
+
+        return new IdempotentTransferMoneyUseCase(withRetry, idempotency);
     }
 }

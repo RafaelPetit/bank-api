@@ -10,6 +10,7 @@ import petit.bank.ledger.domain.port.out.LedgerRepository;
 import petit.bank.transfers.domain.port.in.TransferMoneyCommand;
 import petit.bank.transfers.domain.port.in.TransferMoneyUseCase;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -38,8 +39,7 @@ public class TransferMoneyService implements TransferMoneyUseCase {
         from.debit(command.amount());
         to.credit(command.amount());
 
-        accountRepository.save(from);
-        accountRepository.save(to);
+        accountRepository.saveAll(List.of(from, to));
         ledgerRepository.append(transaction);
 
         return transaction.id();

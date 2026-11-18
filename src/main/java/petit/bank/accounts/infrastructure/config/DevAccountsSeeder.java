@@ -21,10 +21,11 @@ public class DevAccountsSeeder {
     private static final Currency BRL = Currency.getInstance("BRL");
 
     void seed(@Observes StartupEvent event, AccountRepository accounts) {
-        accounts.save(Account.restore(AccountId.of("11111111-1111-1111-1111-111111111111"),
-                Money.of("100.00", BRL)));
+        Account origem = Account.open(AccountId.of("11111111-1111-1111-1111-111111111111"), BRL);
 
-        accounts.save(Account.restore(AccountId.of("22222222-2222-2222-2222-222222222222"),
-                Money.of("0.00", BRL)));
+        origem.credit(Money.of("100.00", BRL));
+        accounts.save(origem);
+
+        accounts.save(Account.open(AccountId.of("22222222-2222-2222-2222-222222222222"), BRL));
     }
 }

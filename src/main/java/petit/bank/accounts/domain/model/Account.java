@@ -9,27 +9,35 @@ import java.util.Objects;
  * Conta bancária: Entity e aggregate root do contexto de contas. Guarda um saldo (projeção
  * dos movimentos) e protege os invariantes do dinheiro — saldo nunca negativo e operações
  * sempre na moeda da conta. É mutável: a mesma conta evolui no tempo mantendo a identidade.
+ * A versão indica a partir de qual gravação a conta foi lida e serve ao controle de
+ * concorrência otimista; o domínio só a carrega, quem a confere é a persistência.
  */
 public final class Account {
     private final AccountId id;
+    private final long version;
     private Money balance;
 
-    private Account(AccountId id, Money balance) {
+    private Account(AccountId id, Money balance, long version) {
         this.id = Objects.requireNonNull(id, "id não pode ser nulo");
         this.balance = Objects.requireNonNull(balance, "balance não pode ser nulo");
 
         if (balance.isNegative()) {
             throw new IllegalArgumentException("Saldo de uma conta não pode ser negativo");
         }
+
+        if (version < 0) {
+            throw new IllegalArgumentException("Versão de uma conta não pode ser negativa");
+        }
+        this.version = version;
     }
 
     public static Account open(AccountId id, Currency currency) {
         Objects.requireNonNull(currency, "currency não pode ser nula");
-        return new Account(id, Money.zero(currency));
+        return new Account(id, Money.zero(currency), 0);
     }
 
-    public static Account restore(AccountId id, Money balance) {
-        return new Account(id, balance);
+    public static Account restore(AccountId id, Money balance, long version) {
+        return new Account(id, balance, version);
     }
 
     public void credit(Money amount) {
@@ -58,6 +66,10 @@ public final class Account {
 
     public Money balance() {
         return balance;
+    }
+
+    public long version() {
+        return version;
     }
 
     @Override
