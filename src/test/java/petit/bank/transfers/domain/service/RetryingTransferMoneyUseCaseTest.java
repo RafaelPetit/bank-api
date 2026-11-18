@@ -7,6 +7,7 @@ import petit.bank.accounts.domain.model.ConcurrentAccountUpdateException;
 import petit.bank.accounts.domain.model.InsufficientFundsException;
 import petit.bank.ledger.domain.model.TransactionId;
 import petit.bank.shared.Money;
+import petit.bank.transfers.domain.model.IdempotencyKey;
 import petit.bank.transfers.domain.port.in.TransferMoneyCommand;
 import petit.bank.transfers.domain.port.in.TransferMoneyUseCase;
 
@@ -26,7 +27,7 @@ public class RetryingTransferMoneyUseCaseTest {
     private final AtomicInteger attempts = new AtomicInteger();
     private final TransactionId transactionId = TransactionId.generate();
     private final TransferMoneyCommand command = new TransferMoneyCommand(AccountId.generate(),
-            AccountId.generate(), Money.of("10.00", BRL));
+            AccountId.generate(), Money.of("10.00", BRL), IdempotencyKey.generate());
 
     @Test
     @DisplayName("repete o conflito e devolve o resultado quando uma tentativa dá certo")
