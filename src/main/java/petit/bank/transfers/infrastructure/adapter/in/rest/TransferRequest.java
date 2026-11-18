@@ -19,13 +19,12 @@ public record TransferRequest(
         @NotBlank @Pattern(regexp = "\\d{1,15}(\\.\\d{1,4})?") String amount,
         @NotBlank String currency) {
 
-    TransferMoneyCommand toCommand() {
+    TransferMoneyCommand toCommand(IdempotencyKey idempotencyKey) {
         return new TransferMoneyCommand(
                 AccountId.of(from),
                 AccountId.of(to),
                 Money.ofExact(amount, Currency.getInstance(currency)),
-                // Provisório: na próxima etapa a chave vem do cabeçalho Idempotency-Key.
-                IdempotencyKey.generate()
+                idempotencyKey
         );
     }
 }
