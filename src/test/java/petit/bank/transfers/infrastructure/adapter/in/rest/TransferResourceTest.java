@@ -9,7 +9,6 @@ import petit.bank.accounts.domain.model.Account;
 import petit.bank.accounts.domain.model.AccountId;
 import petit.bank.accounts.domain.port.out.AccountRepository;
 import petit.bank.shared.Money;
-import petit.bank.transfers.domain.model.IdempotencyKey;
 
 import java.util.Currency;
 
@@ -20,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Testes do adapter REST de transferência com a aplicação Quarkus de pé: conversão do JSON,
- * status HTTP de cada erro de negócio, validação de formato e idempotência pelo cabeçalho.
+ * status HTTP de cada erro de negócio e validação de formato da requisição.
  */
 @QuarkusTest
 public class TransferResourceTest {
@@ -126,54 +125,8 @@ public class TransferResourceTest {
                 .statusCode(400);
     }
 
-    @Test
-    @DisplayName("repetir o pedido com a mesma chave devolve a mesma transação e move o dinheiro uma vez")
-    void repeticaoComMesmaChave() {
-        AccountId origem = contaComSaldo("100.00", BRL);
-        AccountId destino = contaComSaldo("0.00", BRL);
-        String chave = IdempotencyKey.generate().value();
-        String pedido = corpo(origem.toString(), destino.toString(), "30.00", "BRL");
-
-        String primeira = post(chave, pedido).then().statusCode(201).extract().path("transactionId");
-        String segunda = post(chave, pedido).then().statusCode(201).extract().path("transactionId");
-
-        assertEquals(primeira, segunda);
-        assertEquals(Money.of("70.00", BRL), saldoDe(origem));
-    }
-
-    @Test
-    @DisplayName("a mesma chave com outro pedido responde 422 e não move dinheiro de novo")
-    void mesmaChaveOutroPedido() {
-        AccountId origem = contaComSaldo("100.00", BRL);
-        AccountId destino = contaComSaldo("0.00", BRL);
-        String chave = IdempotencyKey.generate().value();
-
-        post(chave, corpo(origem.toString(), destino.toString(), "30.00", "BRL"))
-                .then()
-                .statusCode(201);
-
-        post(chave, corpo(origem.toString(), destino.toString(), "50.00", "BRL"))
-                .then()
-                .statusCode(422)
-                .body("code", equalTo("IDEMPOTENCY_KEY_REUSED"));
-
-        assertEquals(Money.of("70.00", BRL), saldoDe(origem));
-    }
-
-    @Test
-    @DisplayName("pedido sem o cabeçalho Idempotency-Key responde 400 e não move dinheiro")
-    void semIdempotencyKey() {
-        AccountId origem = contaComSaldo("100.00", BRL);
-        AccountId destino = contaComSaldo("0.00", BRL);
-
-        given().contentType("application/json")
-                .body(corpo(origem.toString(), destino.toString(), "30.00", "BRL"))
-                .when()
-                .post("/transfers")
-                .then()
-                .statusCode(400);
-
-        assertEquals(Money.of("100.00", BRL), saldoDe(origem));
+    private Response post(String corpo) {
+        return given().contentType("application/json").body(corpo).when().post("/transfers");
     }
 
     private String corpo(String from, String to, String amount, String currency) {
@@ -182,25 +135,8 @@ public class TransferResourceTest {
                 """.formatted(from, to, amount, currency);
     }
 
-    private Response post(String corpo) {
-        return post(IdempotencyKey.generate().value(), corpo);
-    }
-
-    private Response post(String chave, String corpo) {
-        return given()
-                .contentType("application/json")
-                .header("Idempotency-Key", chave)
-                .body(corpo)
-                .when()
-                .post("/transfers");
-    }
-
     private AccountId contaComSaldo(String valor, Currency moeda) {
-        Account conta = Account.open(AccountId.generate(), moeda);
-        Money saldo = Money.of(valor, moeda);
-        if (saldo.isPositive()) {
-            conta.credit(saldo);
-        }
+        Account conta = Account.restore(AccountId.generate(), Money.of(valor, moeda));
 
         accounts.save(conta);
 

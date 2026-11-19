@@ -101,10 +101,9 @@ public class AccountTest {
     @DisplayName("restore reconstrói a conta com o saldo informado")
     void restoreReconstroiComSaldo() {
         AccountId id = AccountId.generate();
-        Account conta = Account.restore(id, Money.of("150.00", BRL), 3);
+        Account conta = Account.restore(id, Money.of("150.00", BRL));
 
         assertEquals(id, conta.id());
-        assertEquals(3, conta.version());
         assertEquals(Money.of("150.00", BRL), conta.balance());
     }
 
@@ -112,13 +111,6 @@ public class AccountTest {
     @DisplayName("restore rejeita saldo negativo")
     void restoreRejeitaSaldoNegativo() {
         assertThrows(IllegalArgumentException.class,
-                () -> Account.restore(AccountId.generate(), Money.of("-0.01", BRL), 0));
-    }
-
-    @Test
-    @DisplayName("restore rejeita versão negativa")
-    void restoreRejeitaVersaoNegativa() {
-        assertThrows(IllegalArgumentException.class,
-                () -> Account.restore(AccountId.generate(), Money.of("10.00", BRL), -1));
+                () -> Account.restore(AccountId.generate(), Money.of("-0.01", BRL)));
     }
 }

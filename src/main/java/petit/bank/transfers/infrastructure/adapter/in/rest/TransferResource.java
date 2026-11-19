@@ -1,29 +1,21 @@
 package petit.bank.transfers.infrastructure.adapter.in.rest;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
 import org.jboss.resteasy.reactive.RestResponse;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 import petit.bank.accounts.domain.model.AccountNotFoundException;
-import petit.bank.accounts.domain.model.ConcurrentAccountUpdateException;
 import petit.bank.accounts.domain.model.InsufficientFundsException;
 import petit.bank.ledger.domain.model.TransactionId;
 import petit.bank.shared.CurrencyMismatchException;
-import petit.bank.transfers.domain.model.IdempotencyKey;
-import petit.bank.transfers.domain.model.IdempotencyKeyReusedException;
-import petit.bank.transfers.domain.model.TransferInProgressException;
 import petit.bank.transfers.domain.port.in.TransferMoneyUseCase;
 
 /**
  * Adapter de entrada HTTP da transferência. Só traduz: requisição em command, resultado em
- * resposta e exceção de domínio em status HTTP. Não contém regra de negócio. A idempotency key
- * vem do cabeçalho {@code Idempotency-Key}, obrigatório: só o cliente sabe quando dois envios
- * são o mesmo pedido.
+ * resposta e exceção de domínio em status HTTP. Não contém regra de negócio.
  */
 @Path("/transfers")
 public class TransferResource {
@@ -35,10 +27,8 @@ public class TransferResource {
     }
 
     @POST
-    public RestResponse<TransferResponse> transfer(
-            @HeaderParam("Idempotency-Key") @NotBlank String idempotencyKey,
-            @Valid @NotNull TransferRequest request) {
-        TransactionId id = transferMoney.transfer(request.toCommand(IdempotencyKey.of(idempotencyKey)));
+    public RestResponse<TransferResponse> transfer(@Valid @NotNull TransferRequest request) {
+        TransactionId id = transferMoney.transfer(request.toCommand());
 
         return RestResponse.status(Response.Status.CREATED, new TransferResponse(id.toString()));
     }
@@ -57,23 +47,6 @@ public class TransferResource {
     @ServerExceptionMapper
     RestResponse<ErrorResponse> map(CurrencyMismatchException e) {
         return unprocessable("CURRENCY_MISMATCH", "Moeda diferente da moeda da conta");
-    }
-
-    @ServerExceptionMapper
-    RestResponse<ErrorResponse> map(ConcurrentAccountUpdateException e) {
-        return RestResponse.status(Response.Status.CONFLICT,
-                new ErrorResponse("CONCURRENT_UPDATE", "A conta foi alterada por outra operação; tente novamente"));
-    }
-
-    @ServerExceptionMapper
-    RestResponse<ErrorResponse> map(IdempotencyKeyReusedException e) {
-        return unprocessable("IDEMPOTENCY_KEY_REUSED", "Idempotency key já usada em outro pedido");
-    }
-
-    @ServerExceptionMapper
-    RestResponse<ErrorResponse> map(TransferInProgressException e) {
-        return RestResponse.status(Response.Status.CONFLICT,
-                new ErrorResponse("TRANSFER_IN_PROGRESS", "Pedido ainda em processamento; tente novamente"));
     }
 
     @ServerExceptionMapper

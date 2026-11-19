@@ -11,7 +11,6 @@ import petit.bank.ledger.domain.model.TransactionId;
 import petit.bank.ledger.infrastructure.adapter.out.persistence.InMemoryLedgerRepository;
 import petit.bank.shared.CurrencyMismatchException;
 import petit.bank.shared.Money;
-import petit.bank.transfers.domain.model.IdempotencyKey;
 import petit.bank.transfers.domain.port.in.TransferMoneyCommand;
 
 import java.util.Currency;
@@ -38,7 +37,7 @@ public class TransferMoneyServiceTest {
         AccountId destino = contaComSaldo("20.00", BRL);
 
         service.transfer(new TransferMoneyCommand(origem, destino,
-                Money.of("30.00", BRL), IdempotencyKey.generate()));
+                Money.of("30.00", BRL)));
 
         assertEquals(Money.of("70.00", BRL), saldoDe(origem));
         assertEquals(Money.of("50.00", BRL), saldoDe(destino));
@@ -51,7 +50,7 @@ public class TransferMoneyServiceTest {
         AccountId destino = contaComSaldo("0.00", BRL);
 
         TransactionId id = service.transfer(new TransferMoneyCommand(origem, destino,
-                Money.of("30.00", BRL), IdempotencyKey.generate()));
+                Money.of("30.00", BRL)));
 
         assertEquals(1, ledger.transactions().size());
         assertEquals(id, ledger.transactions().getFirst().id());
@@ -65,7 +64,7 @@ public class TransferMoneyServiceTest {
 
         assertThrows(InsufficientFundsException.class,
                 () -> service.transfer(new TransferMoneyCommand(origem, destino,
-                        Money.of("50.00", BRL), IdempotencyKey.generate())));
+                        Money.of("50.00", BRL))));
 
         assertEquals(Money.of("10.00", BRL), saldoDe(origem));
         assertEquals(Money.of("0.00", BRL), saldoDe(destino));
@@ -80,7 +79,7 @@ public class TransferMoneyServiceTest {
 
         assertThrows(CurrencyMismatchException.class,
                 () -> service.transfer(new TransferMoneyCommand(origem, destino,
-                        Money.of("10.00", BRL), IdempotencyKey.generate())));
+                        Money.of("10.00", BRL))));
 
         assertEquals(Money.of("100.00", BRL), saldoDe(origem));
         assertTrue(ledger.transactions().isEmpty());
@@ -94,7 +93,7 @@ public class TransferMoneyServiceTest {
 
         assertThrows(AccountNotFoundException.class,
                 () -> service.transfer(new TransferMoneyCommand(origem, inexistente,
-                        Money.of("10.00", BRL), IdempotencyKey.generate())));
+                        Money.of("10.00", BRL))));
 
         assertEquals(Money.of("100.00", BRL), saldoDe(origem));
         assertTrue(ledger.transactions().isEmpty());
@@ -107,20 +106,14 @@ public class TransferMoneyServiceTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> service.transfer(new TransferMoneyCommand(conta, conta,
-                        Money.of("10.00", BRL), IdempotencyKey.generate())));
+                        Money.of("10.00", BRL))));
 
         assertEquals(Money.of("100.00", BRL), saldoDe(conta));
     }
 
     private AccountId contaComSaldo(String valor, Currency moeda) {
-        Account conta = Account.open(AccountId.generate(), moeda);
-        Money saldo = Money.of(valor, moeda);
-        if (saldo.isPositive()) {
-            conta.credit(saldo);
-        }
-
+        Account conta = Account.restore(AccountId.generate(), Money.of(valor, moeda));
         accounts.save(conta);
-
         return conta.id();
     }
 

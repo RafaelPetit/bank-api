@@ -119,7 +119,7 @@ forma deliberada — saber _quando não distribuir_ faz parte da proposta.
 | Fase | Foco                                                      | Status |
 |:----:|-----------------------------------------------------------|:------:|
 | 0    | Domínio puro + Hexagonal (monólito modular)               | ✅  Concluída |
-| 1    | Concorrência + consistência (locking, idempotência)       | ✅  Concluída |
+| 1    | Concorrência + consistência (locking, idempotência)       | ⏳ |
 | 2    | Persistência + Outbox + testes de integração              | ⏳ |
 | 3    | Kafka + eventos + Saga                                    | ⏳ |
 | 4    | Extração do primeiro serviço + containers + Kubernetes    | ⏳ |
@@ -148,31 +148,16 @@ java -jar target/quarkus-app/quarkus-run.jar
 
 # Imagem nativa (requer GraalVM; ou use -Dquarkus.native.container-build=true)
 ./mvnw package -Dnative
-./target/bank-api-0.2.0-runner
-```
-
-### Exemplo: transferência
-
-No modo de desenvolvimento, duas contas de teste são criadas ao subir a aplicação (a primeira
-com R$ 100,00). O cabeçalho `Idempotency-Key` é obrigatório: repetir a requisição com a mesma
-chave devolve a mesma transação, sem mover dinheiro de novo.
-
-```shell
-curl -i -X POST http://localhost:8080/transfers \
-  -H "Content-Type: application/json" \
-  -H "Idempotency-Key: 7f9c2b1e-0d4a-4c1b-9e8f-3a6d5c2b1a00" \
-  -d '{"from": "11111111-1111-1111-1111-111111111111", "to": "22222222-2222-2222-2222-222222222222", "amount": "30.00", "currency": "BRL"}'
+./target/bank-api-0.1.0-runner
 ```
 
 ---
 
 ## 📌 Status atual
 
-Fase 1 concluída (`v0.2.0`): a transferência é correta sob concorrência e idempotente. Cada
-conta tem versão (lock otimista), origem e destino são gravados juntos (tudo ou nada), conflitos
-são repetidos até 3 vezes e respondem 409 se persistirem, e o cabeçalho `Idempotency-Key`
-garante que repetir o pedido não move dinheiro duas vezes. Os dados ainda ficam em memória e a
-API não tem autenticação, então o uso é apenas local. A próxima é a Fase 2: persistência e Outbox.
+Fase 0 concluída (`v0.1.0`): domínio puro, portas e adapters em memória, com a transferência
+exposta em `POST /transfers`. Os dados ficam em memória e a API ainda não tem autenticação,
+então o uso é apenas local. A próxima é a Fase 1: concorrência e idempotência.
 
 ---
 
