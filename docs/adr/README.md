@@ -11,3 +11,5 @@ e novos ADRs partem do [template](template.md).
 | [0003](0003-dinheiro-como-value-object.md) | Dinheiro como value object com BigDecimal | Aceita |
 | [0004](0004-ledger-de-partidas-dobradas.md) | Ledger de partidas dobradas | Aceita |
 | [0005](0005-contexto-transfers.md) | Contexto transfers orquestra contas e ledger | Aceita |
+| [0006](0006-interfaces-nas-portas.md) | Política de interfaces nas portas | Aceita |
+| [0007](0007-lock-otimista-com-retry.md) | Lock otimista por versão, com retry | Aceita |
