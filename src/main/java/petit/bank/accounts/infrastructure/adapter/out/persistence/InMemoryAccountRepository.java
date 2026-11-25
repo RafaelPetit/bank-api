@@ -1,6 +1,5 @@
 package petit.bank.accounts.infrastructure.adapter.out.persistence;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import petit.bank.accounts.domain.model.Account;
 import petit.bank.accounts.domain.model.AccountId;
 import petit.bank.accounts.domain.model.ConcurrentAccountUpdateException;
@@ -13,13 +12,12 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Adapter de persistência em memória para {@link AccountRepository}, usado em testes e
- * desenvolvimento enquanto não há banco. Imita a semântica de um banco: guarda apenas o
- * estado (saldo e versão) e reconstrói uma conta nova a cada leitura. O {@code saveAll}
- * confere as versões de todas as contas antes de gravar qualquer uma, sob um único lock,
+ * Adapter de persistência em memória para {@link AccountRepository}, usado nos testes unitários,
+ * que não sobem o banco. Não é um bean: a aplicação usa {@link PostgresAccountRepository}.
+ * Imita a semântica de um banco: guarda apenas o estado (saldo e versão) e reconstrói uma conta nova a cada leitura.
+ * O {@code saveAll} confere as versões de todas as contas antes de gravar qualquer uma, sob um único lock,
  * fazendo o papel de uma transação.
  */
-@ApplicationScoped
 public class InMemoryAccountRepository implements AccountRepository {
 
     private final Map<AccountId, StoredAccount> storage = new ConcurrentHashMap<>();
@@ -39,7 +37,7 @@ public class InMemoryAccountRepository implements AccountRepository {
         }
 
         for (Account account : accounts) {
-            storage.put(account.id(), new StoredAccount(account.balance(), account.version() +1));
+            storage.put(account.id(), new StoredAccount(account.balance(), account.version() + 1));
         }
 
     }
