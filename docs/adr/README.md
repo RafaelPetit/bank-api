@@ -1,0 +1,17 @@
+# Architecture Decision Records
+
+As decisões de arquitetura do bank-api: o contexto, o que foi decidido, o que foi descartado e o
+que isso custa. O processo está descrito na [ADR 0001](0001-registrar-decisoes-de-arquitetura.md),
+e novos ADRs partem do [template](template.md).
+
+| ADR | Decisão | Status |
+|-----|---------|--------|
+| [0001](0001-registrar-decisoes-de-arquitetura.md) | Registrar decisões de arquitetura | Aceita |
+| [0002](0002-monolito-modular-hexagonal.md) | Monólito modular com arquitetura hexagonal | Aceita |
+| [0003](0003-dinheiro-como-value-object.md) | Dinheiro como value object com BigDecimal | Aceita |
+| [0004](0004-ledger-de-partidas-dobradas.md) | Ledger de partidas dobradas | Aceita |
+| [0005](0005-contexto-transfers.md) | Contexto transfers orquestra contas e ledger | Aceita |
+| [0006](0006-interfaces-nas-portas.md) | Política de interfaces nas portas | Aceita |
+| [0007](0007-lock-otimista-com-retry.md) | Lock otimista por versão, com retry | Aceita |
+| [0008](0008-idempotency-key.md) | Idempotency key como decorator do caso de uso | Aceita |
+| [0009](0009-jdbc-sem-jpa.md) | Persistência com JDBC puro, sem JPA | Aceita |

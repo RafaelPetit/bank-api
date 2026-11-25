@@ -71,6 +71,9 @@ e o acesso concorrente às contas é protegido por controle de concorrência exp
 (_optimistic locking_). A integração entre banco e mensageria usa o **Outbox Pattern** para
 resolver o _dual-write problem_.
 
+O registro completo de cada decisão, com as alternativas descartadas, está nas
+[ADRs](docs/adr/README.md).
+
 ---
 
 ## 🗂️ Estrutura do projeto
