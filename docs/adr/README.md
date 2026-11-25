@@ -13,3 +13,5 @@ e novos ADRs partem do [template](template.md).
 | [0005](0005-contexto-transfers.md) | Contexto transfers orquestra contas e ledger | Aceita |
 | [0006](0006-interfaces-nas-portas.md) | Política de interfaces nas portas | Aceita |
 | [0007](0007-lock-otimista-com-retry.md) | Lock otimista por versão, com retry | Aceita |
+| [0008](0008-idempotency-key.md) | Idempotency key como decorator do caso de uso | Aceita |
+| [0009](0009-jdbc-sem-jpa.md) | Persistência com JDBC puro, sem JPA | Aceita |
