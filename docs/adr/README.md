@@ -9,3 +9,5 @@ e novos ADRs partem do [template](template.md).
 | [0001](0001-registrar-decisoes-de-arquitetura.md) | Registrar decisões de arquitetura | Aceita |
 | [0002](0002-monolito-modular-hexagonal.md) | Monólito modular com arquitetura hexagonal | Aceita |
 | [0003](0003-dinheiro-como-value-object.md) | Dinheiro como value object com BigDecimal | Aceita |
+| [0004](0004-ledger-de-partidas-dobradas.md) | Ledger de partidas dobradas | Aceita |
+| [0005](0005-contexto-transfers.md) | Contexto transfers orquestra contas e ledger | Aceita |
