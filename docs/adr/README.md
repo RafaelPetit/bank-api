@@ -15,3 +15,4 @@ e novos ADRs partem do [template](template.md).
 | [0007](0007-lock-otimista-com-retry.md) | Lock otimista por versão, com retry | Aceita |
 | [0008](0008-idempotency-key.md) | Idempotency key como decorator do caso de uso | Aceita |
 | [0009](0009-jdbc-sem-jpa.md) | Persistência com JDBC puro, sem JPA | Aceita |
+| [0010](0010-ledger-no-banco.md) | Ledger no banco, append-only e sem chave estrangeira entre contextos | Aceita |
